@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.food_order.Menu.dao.MenuDao">
+    <insert id="insertFood" parameterType="com.example.food_order.Menu.vo.MenuVo">
+        INSERT INTO menu (
+                        food_name,
+                        food_price)
+                    VALUES(
+                         #{foodname},
+                         #{foodprice});
+    </insert>
+
+    <select id="viewFoodMenu" parameterType="com.example.food_order.Menu.vo.RequestMenuListVo" resultType="com.example.food_order.Menu.vo.MenuVo">
+        SELECT
+            food_id,
+            food_name,
+            food_price
+        FROM menu
+        <where>
+            <if test="foodname != '' and foodname != null">
+                food_name = #{foodname}
+            </if>
+        </where>
+        ORDER BY food_id ASC;
+    </select>
+
+    <update id="updateFoodMenu" parameterType="com.example.food_order.Menu.vo.RequestMenuUpdateVo">
+        UPDATE menu SET
+                food_name = #{foodname},
+                food_price = #{foodprice}
+        WHERE food_id = #{food_id};
+    </update>
+
+    <delete id="deleteFoodMenu" parameterType="com.example.food_order.Menu.vo.RequestMenuIdVo">
+        DELETE FROM
+            menu
+        WHERE food_id = #{food_id}
+    </delete>
+
+    <select id="checkExistId" parameterType="com.example.food_order.Menu.vo.RequestMenuIdVo">
+        SELECT EXISTS(SELECT 1 FROM menu WHERE food_id = #{food_id});
+    </select>
+
+    <select id="countFoodMenu" parameterType="com.example.food_order.Menu.vo.RequestMenuListVo">
+        SELECT COUNT(food_id) FROM menu;
+    </select>
+</mapper>

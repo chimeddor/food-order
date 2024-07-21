@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.food_order.Customer.dao.CustomerDao">
+    <insert id="insertCustomer" parameterType="com.example.food_order.Customer.vo.CustomerVo">
+        INSERT INTO
+                customer (
+                    phone,
+                    address,
+                    message)
+                VALUES(
+                    #{phone},
+                    #{address},
+                    #{message});
+    </insert>
+
+    <select id="viewCustomer" parameterType="com.example.food_order.Customer.vo.RequestCustomerListVo"
+            resultType="com.example.food_order.Customer.vo.CustomerVo">
+        SELECT
+            c.customer_id,
+            c.phone,
+            c.address,
+            c.message,
+            m.food_name,
+            m.food_price,
+            f.order_num
+        FROM customer as c
+        LEFT JOIN f_order as f ON f.customer_id = c.customer_id
+        LEFT JOIN menu as m ON m.food_id = f.food_id
+        <where>
+            <if test="phone != '' and phone != null">
+                phone = #{phone}
+            </if>
+            <if test="address != '' and address != null">
+                AND address = #{address}
+            </if>
+        </where>
+        ORDER BY customer_id ASC;
+    </select>
+
+    <update id="updateCustomer" parameterType="com.example.food_order.Customer.vo.RequestCustomerUpdateVo">
+        UPDATE customer SET
+          phone = #{phone},
+          address = #{address},
+          message = #{message}
+        WHERE customer_id = #{customer_id};
+    </update>
+
+
+    <delete id="deleteCustomer" parameterType="com.example.food_order.Customer.vo.RequestCustomerIdVo">
+        DELETE FROM
+                customer
+        WHERE customer_id = #{customer_id}
+    </delete>
+
+    <select id="countCustomer" parameterType="com.example.food_order.Customer.vo.RequestCustomerListVo">
+        SELECT COUNT(customer_id) FROM customer;
+    </select>
+
+    <select id="checkExistId" parameterType="com.example.food_order.Customer.vo.RequestCustomerIdVo">
+        SELECT EXISTS(SELECT 1 FROM customer WHERE customer_id = #{customer_id});
+    </select>
+</mapper>

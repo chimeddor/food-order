@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.food_order.Order.dao.OrderDao">
+    <insert id="createOrder" parameterType="com.example.food_order.Order.vo.OrderVo">
+        INSERT INTO
+            f_order(customer_id,
+                    food_id,
+                    order_num)
+            SELECT #{customerid},
+                   #{foodid}, count(customer_id) + 1 FROM f_order WHERE customer_id = #{customerid};
+    </insert>
+
+    <select id="veiwAllOrders" parameterType="com.example.food_order.Order.vo.RequestOrderListVo"
+            resultType="com.example.food_order.Order.vo.OrderVo">
+        SELECT
+            f.order_id as order_id,
+            f.customer_id as customerid,
+            c.phone as phone,
+            c.address as address,
+            c.message as message,
+            f.food_id as foodid,
+            m.food_name as food,
+            m.food_price as price,
+            f.delivery as delivery,
+            f.order_dte as order_dte,
+            f.succ_delivery as succDel,
+            f.order_num as orderNm
+        FROM
+            f_order as f
+        INNER JOIN customer as c ON f.customer_id = c.customer_id
+        INNER JOIN menu as m ON m.food_id = f.food_id
+        <where>
+            <if test="succDel != null">
+                f.succ_delivery = #{succDel}
+            </if>
+            <if test="order_num != null and order_num > 0 ">
+                AND f.order_num = #{order_num}
+            </if>
+        </where>
+        ORDER BY f.order_id ASC;
+    </select>
+
+    <delete id="deleteOrder" parameterType="com.example.food_order.Order.vo.RequestOrderIdVo">
+        DELETE FROM f_order WHERE order_id = #{orderid}
+    </delete>
+
+    <update id="updateOrders" parameterType="com.example.food_order.Order.vo.RequestUpdateOrderVo">
+        UPDATE f_order SET
+                food_id = #{foodid},
+                succ_delivery = #{succDel}
+        WHERE order_id = #{orderid};
+    </update>
+
+    <select id="checkExistId" parameterType="com.example.food_order.Order.vo.RequestOrderIdVo">
+        SELECT EXISTS(SELECT 1 FROM f_order WHERE order_id = #{orderid});
+    </select>
+
+    <select id="countOrders" parameterType="com.example.food_order.Order.vo.RequestOrderListVo">
+        SELECT COUNT(order_id) FROM f_order;
+    </select>
+</mapper>
